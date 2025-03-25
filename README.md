@@ -1,2 +1,2 @@
-# sqlportfolio
-This is a SQL project that uses the data from my expenses during 2023 and 2024
+SQL Expense tracker
+A data-driven personal fiance analysis tool built with SQLite
