@@ -1,0 +1,463 @@
+
+
+-- Categories table
+CREATE TABLE categories (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    description TEXT
+);
+
+-- Transactions table
+CREATE TABLE transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    date TEXT NOT NULL,
+    amount REAL NOT NULL,
+    category_id INTEGER NOT NULL,
+    description TEXT,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+-- Recurring Expenses table
+CREATE TABLE recurring_expenses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    category_id INTEGER NOT NULL,
+    amount REAL NOT NULL,
+    frequency TEXT CHECK(frequency IN ('Weekly', 'Monthly', 'Yearly')),
+    next_due_date TEXT,
+    is_active INTEGER DEFAULT 1,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+-- Budget table
+CREATE TABLE budget (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    category_id INTEGER NOT NULL,
+    amount REAL NOT NULL,
+    period TEXT CHECK(period IN ('Weekly', 'Monthly', 'Yearly')),
+    start_date TEXT DEFAULT (date('now')),
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+-- Subscription Tracker table
+CREATE TABLE subscriptions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    service_name TEXT NOT NULL,
+    monthly_amount REAL NOT NULL,
+    billing_day INTEGER CHECK(billing_day BETWEEN 1 AND 31),
+    is_active INTEGER DEFAULT 1,
+    category_id INTEGER,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+-- Wishlist table
+CREATE TABLE wishlist (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    item_name TEXT NOT NULL,
+    estimated_amount REAL NOT NULL,
+    priority INTEGER CHECK(priority BETWEEN 1 AND 5),
+    target_date TEXT,
+    is_essential INTEGER DEFAULT 0
+);
+
+-- Analytics table (formerly expense_trends)
+CREATE TABLE analytics (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    year_month TEXT NOT NULL,
+    category_id INTEGER NOT NULL,
+    total_amount REAL NOT NULL,
+    average_amount REAL NOT NULL,
+    updated_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (category_id) REFERENCES categories(id),
+    UNIQUE (year_month, category_id)
+);
+
+
+INSERT INTO categories (name, description) VALUES
+('Groceries', 'Food and household essentials'),
+('Dining Out', 'Restaurants and takeout'),
+('Transportation', 'Fuel, public transit, rideshares'),
+('Entertainment', 'Movies, streaming, hobbies'),
+('Utilities', 'Electricity, water, internet'),
+('Shopping', 'Clothing, electronics, misc purchases'),
+('Healthcare', 'Medications, doctor visits'),
+('Travel', 'Vacations and trips'),
+('Education', 'Books, courses, learning materials');
+
+-- Complete 2023-2024 Transaction Data
+INSERT INTO transactions (date, amount, category_id, description) VALUES
+-- 2023 Data
+-- January
+('2023-01-02', 85.20, 1, 'Whole Foods groceries'),
+('2023-01-05', 15.99, 4, 'Netflix subscription'),
+('2023-01-08', 45.00, 3, 'Gas refill'),
+('2023-01-12', 9.99, 4, 'Spotify Premium'),
+('2023-01-15', 150.00, 5, 'Electric bill'),
+('2023-01-18', 65.30, 2, 'Italian restaurant'),
+('2023-01-22', 89.99, 6, 'Winter boots'),
+('2023-01-25', 22.00, 4, 'Movie ticket'),
+('2023-01-29', 55.00, 7, 'Cold medicine'),
+
+-- February
+('2023-02-01', 15.99, 4, 'Netflix subscription'),
+('2023-02-01', 9.99, 4, 'Spotify Premium'),
+('2023-02-05', 120.00, 2, 'Valentine''s dinner'),
+('2023-02-10', 72.40, 1, 'Grocery haul'),
+('2023-02-14', 45.00, 4, 'Gym membership'),
+('2023-02-16', 19.99, 4, 'Disney+ subscription'),
+('2023-02-20', 38.50, 3, 'Bus pass'),
+('2023-02-23', 65.00, 6, 'Gift shopping'),
+('2023-02-27', 28.00, 2, 'Coffee date'),
+
+-- March
+('2023-03-01', 15.99, 4, 'Netflix subscription'),
+('2023-03-01', 9.99, 4, 'Spotify Premium'),
+('2023-03-05', 95.00, 1, 'Organic groceries'),
+('2023-03-08', 60.00, 3, 'Rideshare to airport'),
+('2023-03-12', 75.50, 8, 'Weekend getaway'),
+('2023-03-15', 45.00, 4, 'Gym membership'),
+('2023-03-18', 110.00, 5, 'Internet bill'),
+('2023-03-22', 200.00, 6, 'New shoes'),
+('2023-03-29', 28.00, 7, 'Allergy medicine'),
+
+-- April
+('2023-04-01', 15.99, 4, 'Netflix subscription'),
+('2023-04-01', 9.99, 4, 'Spotify Premium'),
+('2023-04-05', 78.20, 1, 'Weekly groceries'),
+('2023-04-09', 24.50, 2, 'Brunch'),
+('2023-04-12', 52.00, 3, 'Gas refill'),
+('2023-04-15', 45.00, 4, 'Gym membership'),
+('2023-04-18', 35.00, 4, 'Movie night'),
+('2023-04-22', 85.00, 5, 'Phone bill'),
+('2023-04-27', 42.00, 2, 'Diner dinner'),
+
+-- May
+('2023-05-01', 15.99, 4, 'Netflix subscription'),
+('2023-05-01', 9.99, 4, 'Spotify Premium'),
+('2023-05-05', 62.30, 1, 'Grocery haul'),
+('2023-05-08', 210.00, 7, 'Dentist visit'),
+('2023-05-12', 45.00, 2, 'Burger place'),
+('2023-05-15', 45.00, 4, 'Gym membership'),
+('2023-05-18', 38.00, 3, 'Bike repair'),
+('2023-05-22', 22.00, 4, 'Magazine subscription'),
+('2023-05-27', 75.00, 5, 'Utilities payment'),
+
+-- June
+('2023-06-01', 15.99, 4, 'Netflix subscription'),
+('2023-06-01', 9.99, 4, 'Spotify Premium'),
+('2023-06-05', 88.00, 1, 'BBQ supplies'),
+('2023-06-09', 18.50, 2, 'Smoothies'),
+('2023-06-12', 175.00, 4, 'Concert tickets'),
+('2023-06-15', 45.00, 4, 'Gym membership'),
+('2023-06-18', 65.00, 3, 'Taxi rides'),
+('2023-06-22', 42.00, 2, 'Ice cream outing'),
+('2023-06-27', 90.00, 5, 'AC maintenance'),
+
+-- July
+('2023-07-01', 15.99, 4, 'Netflix subscription'),
+('2023-07-01', 9.99, 4, 'Spotify Premium'),
+('2023-07-05', 70.00, 1, 'Summer fruits'),
+('2023-07-08', 120.00, 8, 'Beach trip'),
+('2023-07-12', 32.00, 4, 'E-book purchase'),
+('2023-07-15', 45.00, 4, 'Gym membership'),
+('2023-07-18', 55.00, 2, 'Pizza delivery'),
+('2023-07-22', 150.00, 6, 'Summer clothes'),
+('2023-07-27', 30.00, 9, 'Online course'),
+
+-- August
+('2023-08-01', 15.99, 4, 'Netflix subscription'),
+('2023-08-01', 9.99, 4, 'Spotify Premium'),
+('2023-08-05', 65.00, 1, 'Groceries'),
+('2023-08-08', 220.00, 5, 'AC repair'),
+('2023-08-12', 28.00, 2, 'Cafe lunch'),
+('2023-08-15', 45.00, 4, 'Gym membership'),
+('2023-08-18', 58.00, 6, 'Beach towel'),
+('2023-08-22', 32.00, 7, 'Sunscreen'),
+('2023-08-27', 25.00, 2, 'Late night snack'),
+
+-- September
+('2023-09-01', 15.99, 4, 'Netflix subscription'),
+('2023-09-01', 9.99, 4, 'Spotify Premium'),
+('2023-09-05', 82.00, 1, 'Back-to-school groceries'),
+('2023-09-08', 350.00, 9, 'Online course'),
+('2023-09-12', 45.00, 2, 'Work lunch'),
+('2023-09-15', 45.00, 4, 'Gym membership'),
+('2023-09-18', 19.99, 4, 'Apple iCloud'),
+('2023-09-22', 75.00, 3, 'Car wash'),
+('2023-09-27', 42.00, 2, 'Coffee shop'),
+
+-- October
+('2023-10-01', 15.99, 4, 'Netflix subscription'),
+('2023-10-01', 9.99, 4, 'Spotify Premium'),
+('2023-10-05', 78.00, 1, 'Fall groceries'),
+('2023-10-08', 120.00, 2, 'Halloween party supplies'),
+('2023-10-12', 45.00, 4, 'Gym membership'),
+('2023-10-15', 85.00, 5, 'Internet bill'),
+('2023-10-18', 65.00, 6, 'Winter jacket'),
+('2023-10-22', 28.00, 7, 'Flu shot'),
+('2023-10-27', 35.00, 2, 'Pumpkin spice latte'),
+
+-- November
+('2023-11-01', 15.99, 4, 'Netflix subscription'),
+('2023-11-01', 9.99, 4, 'Spotify Premium'),
+('2023-11-05', 95.00, 1, 'Thanksgiving groceries'),
+('2023-11-10', 400.00, 6, 'Black Friday deals'),
+('2023-11-15', 45.00, 4, 'Gym membership'),
+('2023-11-18', 110.00, 5, 'Heating bill'),
+('2023-11-22', 65.00, 2, 'Friendsgiving dinner'),
+('2023-11-25', 28.00, 4, 'Movie rental'),
+('2023-11-29', 50.00, 3, 'Oil change'),
+
+-- December
+('2023-12-01', 15.99, 4, 'Netflix subscription'),
+('2023-12-01', 9.99, 4, 'Spotify Premium'),
+('2023-12-05', 120.00, 1, 'Holiday groceries'),
+('2023-12-10', 600.00, 8, 'Christmas flights'),
+('2023-12-15', 45.00, 4, 'Gym membership'),
+('2023-12-18', 150.00, 6, 'Gift shopping'),
+('2023-12-22', 85.00, 2, 'Holiday dinner'),
+('2023-12-25', 200.00, 6, 'Last-minute gifts'),
+('2023-12-29', 40.00, 3, 'Airport parking'),
+
+-- 2024 Data (More budget-conscious)
+-- January
+('2024-01-01', 15.99, 4, 'Netflix subscription'),
+('2024-01-01', 9.99, 4, 'Spotify Premium'),
+('2024-01-05', 70.00, 1, 'Groceries (sale items)'),
+('2024-01-10', 45.00, 4, 'Gym membership'),
+('2024-01-12', 35.00, 2, 'Casual lunch'),
+('2024-01-15', 120.00, 5, 'Electric (energy saving)'),
+('2024-01-20', 50.00, 3, 'Gas'),
+('2024-01-25', 30.00, 6, 'Thrift store finds'),
+('2024-01-29', 10.00, 2, 'Coffee'),
+
+-- February
+('2024-02-01', 15.99, 4, 'Netflix subscription'),
+('2024-02-01', 9.99, 4, 'Spotify Premium'),
+('2024-02-05', 60.00, 2, 'Home-cooked Valentine''s'),
+('2024-02-10', 65.00, 1, 'Groceries'),
+('2024-02-14', 45.00, 4, 'Gym membership'),
+('2024-02-16', 19.99, 4, 'Disney+ subscription'),
+('2024-02-20', 25.00, 3, 'Bike repair'),
+('2024-02-23', 40.00, 6, 'Used book'),
+('2024-02-27', 15.00, 2, 'Tea with friend'),
+
+-- March
+('2024-03-01', 15.99, 4, 'Netflix subscription'),
+('2024-03-01', 9.99, 4, 'Spotify Premium'),
+('2024-03-05', 68.00, 1, 'Budget groceries'),
+('2024-03-08', 40.00, 3, 'Bus pass'),
+('2024-03-12', 60.00, 8, 'Camping trip'),
+('2024-03-15', 45.00, 4, 'Gym membership'),
+('2024-03-18', 95.00, 5, 'Internet bill'),
+('2024-03-22', 80.00, 6, 'Discount shoes'),
+('2024-03-29', 22.00, 7, 'Generic medicine'),
+
+-- April
+('2024-04-01', 15.99, 4, 'Netflix subscription'),
+('2024-04-01', 9.99, 4, 'Spotify Premium'),
+('2024-04-05', 62.00, 1, 'Meal prep ingredients'),
+('2024-04-10', 20.00, 2, 'Picnic lunch'),
+('2024-04-15', 45.00, 4, 'Gym membership'),
+('2024-04-18', 30.00, 4, 'Library book sale'),
+('2024-04-22', 75.00, 5, 'Phone bill'),
+('2024-04-25', 35.00, 6, 'Second-hand jeans'),
+('2024-04-29', 12.00, 2, 'Coffee'),
+
+-- May
+('2024-05-01', 15.99, 4, 'Netflix subscription'),
+('2024-05-01', 9.99, 4, 'Spotify Premium'),
+('2024-05-05', 58.00, 1, 'Groceries'),
+('2024-05-08', 150.00, 7, 'Dentist (insurance covered)'),
+('2024-05-12', 35.00, 2, 'Burger meal'),
+('2024-05-15', 45.00, 4, 'Gym membership'),
+('2024-05-18', 30.00, 3, 'Bike tune-up'),
+('2024-05-22', 18.00, 4, 'Used book'),
+('2024-05-27', 65.00, 5, 'Utilities'),
+
+-- June
+('2024-06-01', 15.99, 4, 'Netflix subscription'),
+('2024-06-01', 9.99, 4, 'Spotify Premium'),
+('2024-06-05', 75.00, 1, 'Summer sale groceries'),
+('2024-06-10', 15.00, 2, 'Iced coffee'),
+('2024-06-15', 45.00, 4, 'Gym membership'),
+('2024-06-18', 50.00, 3, 'Public transit pass'),
+('2024-06-22', 35.00, 2, 'Park picnic'),
+('2024-06-25', 60.00, 6, 'Sandals on sale'),
+('2024-06-29', 25.00, 7, 'Sunscreen'),
+-- July 2024
+('2024-07-01', 15.99, 4, 'Netflix subscription'),
+('2024-07-01', 9.99, 4, 'Spotify Premium'),
+('2024-07-05', 72.00, 1, 'Groceries'),
+('2024-07-09', 28.00, 2, 'Beach picnic'),
+('2024-07-15', 45.00, 4, 'Gym membership'),
+('2024-07-18', 74.99, 5, 'Internet bill'),
+('2024-07-18', 60.00, 5, 'Phone bill'),
+('2024-07-22', 55.00, 6, 'Sunglasses'),
+('2024-07-27', 18.00, 2, 'Ice cream'),
+
+-- August 2024
+('2024-08-01', 15.99, 4, 'Netflix subscription'),
+('2024-08-01', 9.99, 4, 'Spotify Premium'),
+('2024-08-05', 68.00, 1, 'Groceries'),
+('2024-08-09', 120.00, 8, 'Weekend getaway'),
+('2024-08-15', 45.00, 4, 'Gym membership'),
+('2024-08-18', 74.99, 5, 'Internet bill'),
+('2024-08-18', 60.00, 5, 'Phone bill'),
+('2024-08-22', 35.00, 3, 'Bike maintenance'),
+('2024-08-27', 22.00, 7, 'First aid kit'),
+
+-- September 2024
+('2024-09-01', 15.99, 4, 'Netflix subscription'),
+('2024-09-01', 9.99, 4, 'Spotify Premium'),
+('2024-09-05', 75.00, 1, 'Groceries'),
+('2024-09-09', 300.00, 9, 'Online certification'),
+('2024-09-15', 45.00, 4, 'Gym membership'),
+('2024-09-18', 74.99, 5, 'Internet bill'),
+('2024-09-18', 60.00, 5, 'Phone bill'),
+('2024-09-22', 19.99, 4, 'Cloud storage'),
+('2024-09-27', 15.00, 2, 'Coffee shop'),
+
+-- October 2024
+('2024-10-01', 15.99, 4, 'Netflix subscription'),
+('2024-10-01', 9.99, 4, 'Spotify Premium'),
+('2024-10-05', 80.00, 1, 'Groceries'),
+('2024-10-09', 45.00, 2, 'Pumpkin patch outing'),
+('2024-10-15', 45.00, 4, 'Gym membership'),
+('2024-10-18', 74.99, 5, 'Internet bill'),
+('2024-10-18', 60.00, 5, 'Phone bill'),
+('2024-10-22', 65.00, 6, 'Winter coat'),
+('2024-10-27', 28.00, 7, 'Flu vaccine'),
+
+-- November 2024
+('2024-11-01', 15.99, 4, 'Netflix subscription'),
+('2024-11-01', 9.99, 4, 'Spotify Premium'),
+('2024-11-05', 85.00, 1, 'Groceries'),
+('2024-11-09', 350.00, 6, 'Black Friday deals'),
+('2024-11-15', 45.00, 4, 'Gym membership'),
+('2024-11-18', 74.99, 5, 'Internet bill'),
+('2024-11-18', 60.00, 5, 'Phone bill'),
+('2024-11-22', 110.00, 5, 'Heating bill'),
+('2024-11-27', 40.00, 2, 'Friendsgiving potluck'),
+
+-- December 2024
+('2024-12-01', 15.99, 4, 'Netflix subscription'),
+('2024-12-01', 9.99, 4, 'Spotify Premium'),
+('2024-12-05', 95.00, 1, 'Groceries'),
+('2024-12-09', 500.00, 8, 'Holiday flights'),
+('2024-12-15', 45.00, 4, 'Gym membership'),
+('2024-12-18', 74.99, 5, 'Internet bill'),
+('2024-12-18', 60.00, 5, 'Phone bill'),
+('2024-12-22', 120.00, 6, 'Gift shopping'),
+('2024-12-27', 65.00, 2, 'Family dinner');
+
+INSERT INTO recurring_expenses (name, category_id, amount, frequency, next_due_date, is_active) VALUES
+-- Fixed Monthly Subscriptions (from transactions)
+('Netflix', 4, 15.99, 'Monthly', '2025-01-01', 1),
+('Spotify Premium', 4, 9.99, 'Monthly', '2025-01-01', 1),
+('Gym Membership', 4, 45.00, 'Monthly', '2025-01-15', 1),
+
+-- Utilities (from transactions)
+('Internet Bill', 5, 79.99, 'Monthly', '2025-01-18', 1),  -- 2023 rate
+('Phone Bill', 5, 65.00, 'Monthly', '2025-01-18', 1),     -- 2023 rate
+('Reduced Internet', 5, 74.99, 'Monthly', '2025-01-18', 1), -- 2024 rate
+('Reduced Phone', 5, 60.00, 'Monthly', '2025-01-18', 1),   -- 2024 rate
+
+-- Annual Subscriptions (inferred)
+('Amazon Prime', 6, 139.00, 'Yearly', '2024-09-15', 1),
+('Costco Membership', 6, 60.00, 'Yearly', '2024-11-01', 1);
+
+drop table subscriptions;
+
+CREATE TABLE subscription_tracker (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    service_name TEXT NOT NULL,
+    category_id INTEGER,
+    monthly_cost REAL NOT NULL,
+    billing_cycle_day INTEGER CHECK(billing_cycle_day BETWEEN 1 AND 31),
+    is_active INTEGER DEFAULT 1,
+    notes TEXT,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+INSERT INTO subscription_tracker 
+(service_name, category_id, monthly_cost, billing_cycle_day, is_active, notes) 
+VALUES
+('Netflix Premium', 4, 15.99, 1, 1, '4K UHD Plan'),
+('Spotify Family', 4, 9.99, 1, 1, 'Student discount'),
+('Gym Membership', 4, 45.00, 15, 1, 'Includes pool access'),
+('Internet Basic', 5, 74.99, 18, 1, '300Mbps speed'),
+('Mobile Plan', 5, 60.00, 18, 1, '5GB data');
+
+INSERT INTO budget (category_id, amount, period, start_date) VALUES
+(1, 400.00, 'Monthly', '2024-01-01'),  -- Groceries
+(2, 150.00, 'Monthly', '2024-01-01'),  -- Dining Out
+(3, 200.00, 'Monthly', '2024-01-01'),  -- Transportation
+(4, 100.00, 'Monthly', '2024-01-01'),  -- Entertainment
+(5, 300.00, 'Monthly', '2024-01-01');  -- Utilities
+
+INSERT INTO wishlist (item_name, estimated_amount, priority, target_date, is_essential) VALUES
+-- High Priority (1-2)
+('New laptop', 1200.00, 1, '2024-06-15', 1),
+('Emergency fund ($5k)', 5000.00, 1, '2024-12-31', 1),
+('Winter coat', 150.00, 2, '2024-10-01', 1),
+('Car tires replacement', 600.00, 2, '2024-08-20', 1),
+
+-- Medium Priority (3)
+('Smartwatch', 299.99, 3, '2024-07-30', 0),
+('Noise-canceling headphones', 350.00, 3, NULL, 0),
+('Standing desk', 250.00, 3, '2024-09-01', 0),
+('Cookware set', 180.00, 3, NULL, 0),
+
+-- Low Priority (4-5)
+('Designer sunglasses', 220.00, 4, '2024-07-15', 0),
+('Weekend getaway', 800.00, 4, NULL, 0),
+('Gaming console', 499.99, 5, '2024-11-15', 0),
+('Limited edition sneakers', 200.00, 5, NULL, 0);
+
+INSERT INTO budget (category_id, amount, period, start_date) VALUES
+(1, 400.00, 'Monthly', '2024-01-01'),  -- Groceries
+(2, 150.00, 'Monthly', '2024-01-01'),  -- Dining Out
+(3, 200.00, 'Monthly', '2024-01-01'),  -- Transportation
+(4, 100.00, 'Monthly', '2024-01-01'),  -- Entertainment
+(5, 300.00, 'Monthly', '2024-01-01');  -- Utilities
+
+CREATE TABLE analytics (
+    year_month TEXT NOT NULL,
+    cat_id INTEGER NOT NULL,
+    total_spent REAL NOT NULL CHECK(total_spent = ROUND(total_spent, 2)),
+    average_spent REAL NOT NULL CHECK(average_spent = ROUND(average_spent, 2)),
+    last_updated TEXT DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (cat_id) REFERENCES categories(id),
+    PRIMARY KEY (year_month, cat_id)
+);
+
+-- Populate with properly rounded values
+INSERT INTO analytics (year_month, cat_id, total_spent, average_spent)
+SELECT 
+    strftime('%Y-%m', date),
+    category_id,
+    ROUND(SUM(amount), 2),
+    ROUND(AVG(amount), 2)
+FROM transactions
+GROUP BY strftime('%Y-%m', date), category_id;
+
+CREATE TRIGGER update_analytics 
+AFTER INSERT ON transactions
+BEGIN
+    DELETE FROM analytics 
+    WHERE year_month = strftime('%Y-%m', NEW.date) 
+      AND cat_id = NEW.category_id;
+    
+    INSERT INTO analytics (year_month, cat_id, total_spent, average_spent)
+    SELECT 
+        strftime('%Y-%m', NEW.date),
+        NEW.category_id,
+        ROUND(SUM(amount), 2),
+        ROUND(AVG(amount), 2)
+    FROM transactions
+    WHERE strftime('%Y-%m', date) = strftime('%Y-%m', NEW.date)
+      AND category_id = NEW.category_id;
+END;
+
+
