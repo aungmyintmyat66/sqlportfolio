@@ -1,4 +1,4 @@
---spending comparison (2023 vs 2024)
+1--spending comparison (2023 vs 2024)
 WITH yearly_spending AS (
   SELECT 
     strftime('%Y', date) AS year,
@@ -27,7 +27,7 @@ JOIN
   ON y2023.category = y2024.category
 ORDER BY ABS(percentage_change) DESC;
 
--- essential vs non-essential
+2-- essential vs non-essential
 SELECT 
   CASE WHEN is_essential = 1 THEN 'Essential' ELSE 'Non-essential' END AS priority,
   SUM(estimated_amount) AS total_estimated_cost,
@@ -38,7 +38,7 @@ GROUP BY is_essential
 ORDER BY total_estimated_cost DESC;
 
 
--- highest spending month
+3-- highest spending month
 WITH 
 peak_month AS (
   SELECT
